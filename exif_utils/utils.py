@@ -1,88 +1,21 @@
-import logging
-import platform
-import re
-import shutil
-import subprocess
-from pathlib import Path
+import os
+from typing import List
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageOps
+from PIL import Image, ImageDraw, ImageOps
 
-from enums.constant import TRANSPARENT
-
-if platform.system() == 'Windows':
-    EXIFTOOL_PATH = Path('./exiftool/exiftool.exe')
-    ENCODING = 'gbk'
-elif shutil.which('exiftool') is not None:
-    EXIFTOOL_PATH = shutil.which('exiftool')
-    ENCODING = 'utf-8'
-else:
-    EXIFTOOL_PATH = Path('./exiftool/exiftool')
-    ENCODING = 'utf-8'
-
-logger = logging.getLogger(__name__)
+from exif_utils.constant import TRANSPARENT
 
 
-def get_file_list(path):
-    """
-    获取 jpg 文件列表
-    :param path: 路径
-    :return: 文件名
-    """
-    path = Path(path, encoding=ENCODING)
-    return [file_path for file_path in path.iterdir()
-            if file_path.is_file() and file_path.suffix in ['.jpg', '.jpeg', '.JPG', '.JPEG']]
+def getImagesPath(dir_path: str, suffix: List[str] = [".jpeg", ".NEF"]) -> List[str]:
+    assert os.path.exists(dir_path), f"Path {dir_path} does not exist"
+    assert os.path.isdir(dir_path), f"Path {dir_path} is not a directory"
 
-
-def get_exif(path) -> dict:
-    """
-    获取exif信息
-    :param path: 照片路径
-    :return: exif信息
-    """
-    exif_dict = {}
-    try:
-        output_bytes = subprocess.check_output([EXIFTOOL_PATH, '-d', '%Y-%m-%d %H:%M:%S%3f%z', path])
-        output = output_bytes.decode('utf-8', errors='ignore')
-
-        lines = output.splitlines()
-        utf8_lines = [line for line in lines]
-
-        for line in utf8_lines:
-            # 将每一行按冒号分隔成键值对
-            kv_pair = line.split(':')
-            if len(kv_pair) < 2:
-                continue
-            key = kv_pair[0].strip()
-            value = ':'.join(kv_pair[1:]).strip()
-            # 将键中的空格移除
-            key = re.sub(r'\s+', '', key)
-            key = re.sub(r'/', '', key)
-            # 将键值对添加到字典中
-            exif_dict[key] = value
-        for key, value in exif_dict.items():
-            # 过滤非 ASCII 字符
-            value_clean = ''.join(c for c in value if ord(c) < 128)
-            # 将处理后的值更新到 exif_dict 中
-            exif_dict[key] = value_clean
-    except Exception as e:
-        logger.error(f'get_exif error: {path} : {e}')
-
-    return exif_dict
-
-
-def insert_exif(source_path, target_path) -> None:
-    """
-    复制照片的 exif 信息
-    :param source_path: 源照片路径
-    :param target_path: 目的照片路径
-    """
-    try:
-        # 将 exif 信息转换为字节串
-        subprocess.check_output([EXIFTOOL_PATH, '-tagsfromfile', source_path, '-overwrite_original', target_path])
-    except ValueError as e:
-        logger.exception(f'ValueError: {source_path}: cannot insert exif {str(e)}')
+    file_list = [
+        os.path.join(dir_path, file)
+        for file in os.listdir(dir_path)
+        if file.endswith(tuple(suffix))
+    ]
+    return file_list
 
 
 TINY_HEIGHT = 800
