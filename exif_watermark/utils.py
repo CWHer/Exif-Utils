@@ -80,31 +80,6 @@ def padding_image(image, padding_size, padding_location='tb', color=TRANSPARENT)
     return padding_img
 
 
-def square_image(image, auto_close=True) -> Image.Image:
-    """
-    将图片按照正方形进行填充
-    :param auto_close: 是否自动关闭图片对象
-    :param image: 图片对象
-    :return: 填充后的图片对象
-    """
-    # 计算图片的宽度和高度
-    width, height = image.size
-    if width == height:
-        return image
-
-    # 计算需要填充的白色区域大小
-    delta_w = abs(width - height)
-    padding = (delta_w // 2, 0) if width < height else (0, delta_w // 2)
-
-    square_img = ImageOps.expand(image, padding, fill='white')
-
-    if auto_close:
-        image.close()
-
-    # 返回正方形图片对象
-    return square_img
-
-
 def resize_image_with_height(image, height, auto_close=True):
     """
     按照高度对图片进行缩放

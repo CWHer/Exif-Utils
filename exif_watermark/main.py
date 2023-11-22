@@ -1,22 +1,26 @@
+import argparse
 import logging
 import sys
 from pathlib import Path
-
-from tqdm import tqdm
+from typing import List
 
 from entity.image_container import ImageContainer
 from entity.image_processor import ProcessorChain
 from enums.constant import DEBUG
-from init import MARGIN_PROCESSOR
-from init import PADDING_TO_ORIGINAL_RATIO_PROCESSOR
-from init import SEPARATE_LINE
-from init import SHADOW_PROCESSOR
-from init import SIMPLE_PROCESSOR
-from init import config
-from init import layout_items_dict
-from init import root_menu
-from utils import ENCODING
-from utils import get_file_list
+from init import (MARGIN_PROCESSOR, PADDING_TO_ORIGINAL_RATIO_PROCESSOR,
+                  SEPARATE_LINE, SHADOW_PROCESSOR, SIMPLE_PROCESSOR, config,
+                  layout_items_dict, root_menu)
+from tqdm import tqdm
+from utils import ENCODING, get_file_list
+
+
+def parseConfig(config_path: str) -> Tuple[List[str], List[Transform]]:
+    # parse config file
+
+
+
+def runProcessing(file_list: List[str], transforms: List[Transform]):
+    pass
 
 
 def processing():
@@ -80,63 +84,10 @@ def processing():
             state = 0
 
 
-state = 0
-current_menu = root_menu
-root_menu.set_parent(root_menu)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", help="config file path", default="config.yaml")
+    args = parser.parse_args()
 
-if __name__ == '__main__':
-    print(SEPARATE_LINE)
-    print('''
-本工具为开源工具，遵循 Apache 2.0 License 发布。如果您在使用过程中遇到问题，请联系作者：
-GitHub: @leslievan
-Bilibili: @吨吨吨的半夏
-项目介绍：https://www.bilibili.com/video/BV11A411U7Kn
-项目地址：https://github.com/leslievan/semi-utils
-项目介绍（博客）：https://lsvm.xyz/2023/02/semi-utils-intro/
-项目发布页：https://docs.qq.com/sheet/DTXF5c2lHeUZYREtw
-''')
-    while True:
-        try:
-            # 0：主菜单，100：处理图片，-1：退出程序，其他：子菜单
-            if state == 0:
-                # 显示主菜单
-                print(SEPARATE_LINE)
-                current_menu.display()
-                print(SEPARATE_LINE)
-
-                # 处理用户输入
-                user_input = input(
-                    '输入【y 或回车】按照当前设置开始处理图片，输入【数字】修改设置，输入【r】返回上一层菜单，输入【x】退出程序\n')
-
-                # y 或回车，跳转状态 100，开始处理图片
-                if user_input == 'y' or user_input == '':
-                    state = 100
-                # x 退出程序
-                elif user_input == 'x' or user_input == 'X':
-                    sys.exit(0)
-                # r 返回上一层
-                elif user_input == 'r' or user_input == 'R':
-                    current_menu = current_menu.get_parent()
-                # 数字合法则跳转到对应子菜单
-                elif user_input.isdigit() and 1 <= int(user_input) <= len(current_menu.components):
-                    current_menu = current_menu.components[int(user_input) - 1]
-                    if current_menu.is_leaf():
-                        current_menu.run()
-                        current_menu = root_menu
-                else:
-                    print('输入错误，请重新输入')
-            elif state == 100:
-                # 处理数据的代码
-                print(SEPARATE_LINE)
-                processing()
-            elif state == -1:
-                # 退出程序
-                sys.exit(0)
-            elif state == -2:
-                sys.exit(1)
-            # 保存配置
-            config.save()
-        except Exception as e:
-            logging.exception(f'Error: {str(e)}')
-            if DEBUG:
-                raise e
+    file_list, transforms = parseConfig(args.config)
+    runProcessing(file_list, transforms)

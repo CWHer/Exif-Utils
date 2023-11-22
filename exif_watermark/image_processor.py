@@ -10,11 +10,8 @@ from exif_utils.constant import GRAY
 from exif_utils.constant import TRANSPARENT
 from utils import append_image_by_side
 from utils import concatenate_image
-from utils import merge_images
 from utils import padding_image
-from utils import resize_image_with_height
 from utils import resize_image_with_width
-from utils import square_image
 from utils import text_to_image
 
 printable = set(string.printable)
@@ -63,13 +60,6 @@ class ProcessorChain(ProcessorComponent):
             component.process(container)
 
 
-class EmptyProcessor(ProcessorComponent):
-    LAYOUT_ID = 'empty'
-
-    def process(self, container: ImageContainer) -> None:
-        pass
-
-
 class ShadowProcessor(ProcessorComponent):
     LAYOUT_ID = 'shadow'
 
@@ -90,15 +80,6 @@ class ShadowProcessor(ProcessorComponent):
         # 将原始图像放置在阴影图像上方
         shadow.paste(image, (radius, radius))
         container.update_watermark_img(shadow)
-
-
-class SquareProcessor(ProcessorComponent):
-    LAYOUT_ID = 'square'
-    LAYOUT_NAME = '1:1填充'
-
-    def process(self, container: ImageContainer) -> None:
-        image = container.get_watermark_img()
-        container.update_watermark_img(square_image(image, auto_close=False))
 
 
 class WatermarkProcessor(ProcessorComponent):
@@ -292,50 +273,6 @@ class MarginProcessor(ProcessorComponent):
         padding_size = int(config.get_white_margin_width() * min(container.get_width(), container.get_height()) / 100)
         padding_img = padding_image(container.get_watermark_img(), padding_size, 'tlr', color=config.bg_color)
         container.update_watermark_img(padding_img)
-
-
-class SimpleProcessor(ProcessorComponent):
-    LAYOUT_ID = 'simple'
-    LAYOUT_NAME = '简洁'
-
-    def process(self, container: ImageContainer) -> None:
-        ratio = .16 if container.get_ratio() >= 1 else .1
-        padding_ratio = .5 if container.get_ratio() >= 1 else .5
-
-        first_text = text_to_image('Shot on',
-                                   self.config.get_alternative_font(),
-                                   self.config.get_alternative_bold_font(),
-                                   is_bold=False,
-                                   fill='#212121')
-        model = text_to_image(container.get_model().replace(r'/', ' ').replace(r'_', ' '),
-                              self.config.get_alternative_font(),
-                              self.config.get_alternative_bold_font(),
-                              is_bold=True,
-                              fill='#D32F2F')
-        make = text_to_image(container.get_make().split(' ')[0],
-                             self.config.get_alternative_font(),
-                             self.config.get_alternative_bold_font(),
-                             is_bold=True,
-                             fill='#212121')
-        first_line = merge_images([first_text, MIDDLE_HORIZONTAL_GAP, model, MIDDLE_HORIZONTAL_GAP, make], 0, 1)
-        second_line_text = container.get_param_str()
-        second_line = text_to_image(second_line_text,
-                                    self.config.get_alternative_font(),
-                                    self.config.get_alternative_bold_font(),
-                                    is_bold=False,
-                                    fill='#9E9E9E')
-        image = merge_images([first_line, MIDDLE_VERTICAL_GAP, second_line], 1, 0)
-        height = container.get_height() * ratio * padding_ratio
-        image = resize_image_with_height(image, int(height))
-        horizontal_padding = int((container.get_width() - image.width) / 2)
-        vertical_padding = int((container.get_height() * ratio - image.height) / 2)
-
-        watermark = ImageOps.expand(image, (horizontal_padding, vertical_padding), fill=TRANSPARENT)
-        bg = Image.new('RGBA', watermark.size, color='white')
-        bg = Image.alpha_composite(bg, watermark)
-
-        watermark_img = merge_images([container.get_watermark_img(), bg], 1, 1)
-        container.update_watermark_img(watermark_img)
 
 
 class PaddingToOriginalRatioProcessor(ProcessorComponent):
