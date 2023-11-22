@@ -1,6 +1,6 @@
-# Exif-Utils
+# Exif-Watermark
 
-[![license](https://img.shields.io/github/license/CWHer/Exif-Utils)](https://github.com/CWHer/Exif-Utils/blob/master/LICENSE) ![language](https://img.shields.io/github/languages/top/CWHer/Exif-Utils?color=orange)
+[![license](https://img.shields.io/github/license/CWHer/Exif-Watermark)](https://github.com/CWHer/Exif-Watermark/blob/master/LICENSE) ![language](https://img.shields.io/github/languages/top/CWHer/Exif-Watermark?color=orange)
 
 **This is a tool for adding Exif watermarks to photos, manipulating photo pixel ratios, image color and quality.**
 
