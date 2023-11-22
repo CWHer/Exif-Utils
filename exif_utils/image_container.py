@@ -9,62 +9,12 @@ from PIL.Image import Transpose
 from dateutil import parser
 
 from entity.config import ElementConfig
-from enums.constant import *
+from exif_utils.constant import *
 from utils import calculate_pixel_count
 from utils import extract_attribute
 from utils import get_exif
 
 logger = logging.getLogger(__name__)
-
-
-class ExifId(Enum):
-    CAMERA_MODEL = 'CameraModelName'
-    CAMERA_MAKE = 'Make'
-    LENS_MODEL = ['LensModel', 'Lens']
-    LENS_MAKE = 'LensMake'
-    DATETIME = 'DateTimeOriginal'
-    FOCAL_LENGTH = 'FocalLength'
-    FOCAL_LENGTH_IN_35MM_FILM = 'FocalLengthIn35mmFormat'
-    F_NUMBER = 'FNumber'
-    ISO = 'ISO'
-    EXPOSURE_TIME = 'ExposureTime'
-    SHUTTER_SPEED_VALUE = 'ShutterSpeedValue'
-    ORIENTATION = 'Orientation'
-
-
-PATTERN = re.compile(r"(\d+)\.")  # 匹配小数
-
-
-def get_datetime(exif) -> datetime:
-    dt = datetime.now()
-    try:
-        dt = parser.parse(extract_attribute(exif, ExifId.DATETIME.value,
-                                            default_value=str(datetime.now())))
-    except ValueError as e:
-        logger.info(f'Error: 时间格式错误：{extract_attribute(exif, ExifId.DATETIME.value)}')
-    return dt
-
-
-def get_focal_length(exif):
-    focal_length = DEFAULT_VALUE
-    focal_length_in_35mm_film = DEFAULT_VALUE
-
-    try:
-        focal_lengths = PATTERN.findall(extract_attribute(exif, ExifId.FOCAL_LENGTH.value))
-        try:
-            focal_length = focal_lengths[0] if focal_length else DEFAULT_VALUE
-        except IndexError as e:
-            logger.info(
-                f'ValueError: 不存在焦距：{focal_lengths} : {e}')
-        try:
-            focal_length_in_35mm_film: str = focal_lengths[1] if focal_length else DEFAULT_VALUE
-        except IndexError as e:
-            logger.info(f'ValueError: 不存在 35mm 焦距：{focal_lengths} : {e}')
-    except Exception as e:
-        logger.info(f'KeyError: 焦距转换错误：{extract_attribute(exif, ExifId.FOCAL_LENGTH.value)} : {e}')
-
-    return focal_length, focal_length_in_35mm_film
-
 
 class ImageContainer(object):
     def __init__(self, path: Path):

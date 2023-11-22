@@ -18,41 +18,6 @@ def getImagesPath(dir_path: str, suffix: List[str] = [".jpeg", ".NEF"]) -> List[
     return file_list
 
 
-TINY_HEIGHT = 800
-
-
-def remove_white_edge(image):
-    """
-    移除图片白边
-    :param image: 图片对象
-    :return: 移除白边后的图片对象
-    """
-    # 获取像素信息
-    pixels = image.load()
-
-    # 获取图像大小
-    width, height = image.size
-
-    # 计算最小的 X、Y、最大的 X、Y 坐标
-    min_x, min_y = width - 1, height - 1
-    max_x, max_y = 0, 0
-    for y in range(height):
-        for x in range(width):
-            if pixels[x, y] != (255, 255, 255):
-                min_x = min(min_x, x)
-                min_y = min(min_y, y)
-                max_x = max(max_x, x)
-                max_y = max(max_y, y)
-
-    # 计算新的图像大小
-    new_width = max_x - min_x + 1
-    new_height = max_y - min_y + 1
-
-    # 裁剪图像
-    new_image = image.crop((min_x, min_y, max_x + 1, max_y + 1))
-    return new_image
-
-
 def concatenate_image(images, align='left'):
     """
     将多张图片拼接成一列
@@ -209,7 +174,8 @@ def append_image_by_side(background, images, side='left', padding=200, is_start=
         for i in images:
             if i is None:
                 continue
-            i = resize_image_with_height(i, background.height, auto_close=False)
+            i = resize_image_with_height(
+                i, background.height, auto_close=False)
             x_offset -= i.width
             x_offset -= padding
             background.paste(i, (x_offset, 0))
@@ -221,7 +187,8 @@ def append_image_by_side(background, images, side='left', padding=200, is_start=
         for i in images:
             if i is None:
                 continue
-            i = resize_image_with_height(i, background.height, auto_close=False)
+            i = resize_image_with_height(
+                i, background.height, auto_close=False)
             background.paste(i, (x_offset, 0))
             x_offset += i.width
             x_offset += padding
@@ -262,7 +229,8 @@ def merge_images(images, axis=0, align=0):
         max_height = sum(heights)
 
     # 创建输出图像
-    output_image = Image.new('RGBA', (total_width, max_height), color=TRANSPARENT)
+    output_image = Image.new(
+        'RGBA', (total_width, max_height), color=TRANSPARENT)
 
     # 拼接图像
     x_offset, y_offset = 0, 0
@@ -287,27 +255,3 @@ def merge_images(images, axis=0, align=0):
             y_offset += img.size[1]
 
     return output_image
-
-
-def calculate_pixel_count(width: int, height: int) -> str:
-    # 计算像素总数
-    pixel_count = width * height
-    # 计算百万像素数
-    megapixel_count = pixel_count / 1000000.0
-    # 返回结果字符串
-    return f"{megapixel_count:.2f} MP"
-
-
-def extract_attribute(data_dict: dict, *keys, default_value: str = '', prefix='', suffix='') -> str:
-    """
-    从字典中提取对应键的属性值
-
-    :param data_dict: 包含属性值的字典
-    :param keys: 一个或多个键
-    :param default_value: 默认值，默认为空字符串
-    :return: 对应的属性值或空字符串
-    """
-    for key in keys:
-        if key in data_dict:
-            return data_dict[key] + suffix
-    return default_value

@@ -6,8 +6,8 @@ from PIL import ImageOps
 
 from entity.config import Config
 from entity.image_container import ImageContainer
-from enums.constant import GRAY
-from enums.constant import TRANSPARENT
+from exif_utils.constant import GRAY
+from exif_utils.constant import TRANSPARENT
 from utils import append_image_by_side
 from utils import concatenate_image
 from utils import merge_images
