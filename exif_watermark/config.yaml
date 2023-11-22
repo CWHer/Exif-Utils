@@ -1,45 +1,26 @@
 base:
-    font_dir: ../assets/fonts
     logo_dir: ../assets/logos
 
-    bold_font: AlibabaPuHuiTi-2-85-Bold.otf
-    bold_font_size: 1
-    font: AlibabaPuHuiTi-2-45-Light.otf
-    font_size: 1
+    font: ../assets/fonts/AlibabaPuHuiTi-2-45-Light.otf
+    bold_font: ../assets/fonts/AlibabaPuHuiTi-2-85-Bold.otf
 
     input_dir: ../factory/input
     output_dir: ../factory/output
     quality: 100
 
-global:
-    padding_with_original_ratio:
-        enable: false
-    shadow:
-        enable: false
-    white_margin:
-        enable: true
-        width: 3
-
 layout:
-    background_color: "#ffffff"
-    elements:
-        left_bottom:
-            color: "#757575"
-            is_bold: false
-            name: Model
-        left_top:
-            color: "#212121"
-            is_bold: true
-            name: LensModel
-        right_bottom:
-            color: "#757575"
-            is_bold: false
-            name: Datetime
-            value: Photo by NONE
-        right_top:
-            color: "#212121"
-            is_bold: true
-            name: Param
-    logo_enable: false
-    logo_position: left
-    type: watermark_right_logo
+    margin:
+        enable: true
+        color: "#ffffff"
+        size: 100
+
+    exif_mark:
+        font_size: 1
+        bold_font_size: 1
+        logo_position: left
+        mark_position: below
+        enable_dark_mode: False
+
+    background:
+        color: "#ffffff"
+        use_blur_image: false

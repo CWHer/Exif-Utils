@@ -3,8 +3,6 @@ from typing import List
 
 from PIL import Image, ImageDraw, ImageOps
 
-from exif_utils.constant import TRANSPARENT
-
 
 def getImagesPath(dir_path: str, suffix: List[str] = [".jpeg", ".NEF"]) -> List[str]:
     assert os.path.exists(dir_path), f"Path {dir_path} does not exist"
@@ -16,6 +14,12 @@ def getImagesPath(dir_path: str, suffix: List[str] = [".jpeg", ".NEF"]) -> List[
         if file.endswith(tuple(suffix))
     ]
     return file_list
+
+
+def toAbsPath(path: str) -> str:
+    if not os.path.isabs(path):
+        path = os.path.abspath(path)
+    return path
 
 
 def concatenate_image(images, align='left'):
@@ -51,7 +55,7 @@ def concatenate_image(images, align='left'):
     return new_img
 
 
-def padding_image(image, padding_size, padding_location='tb', color=TRANSPARENT) -> Image.Image:
+def padding_image(image, padding_size, padding_location='tb', color=None) -> Image.Image:
     """
     在图片四周填充白色像素
     :param image: 图片对象

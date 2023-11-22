@@ -2,6 +2,8 @@ import json
 import os
 from typing import Dict
 
+from utils import toAbsPath
+
 
 class LogoManager:
     def __init__(self) -> None:
@@ -9,7 +11,7 @@ class LogoManager:
         self.logo_map: Dict[str, str]
 
     def setup(self, dir_path: str):
-        self.dir_path = dir_path if os.path.isabs(dir_path) else os.path.abspath(dir_path)
+        self.dir_path = toAbsPath(dir_path)
         assert os.path.exists(self.dir_path), f"Path {self.dir_path} does not exist"
         config_path = os.path.join(self.dir_path, "config.json")
         assert os.path.exists(config_path), f"Path {config_path} does not exist"
