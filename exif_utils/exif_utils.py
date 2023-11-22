@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 import os
 from typing import Optional
@@ -33,6 +34,15 @@ EXIF_KEY_MAP = {
     "EXIF ISOSpeedRatings": "iso_speed_ratings",
 }
 
+EXIF_TRANSFORM_MAP = {
+    "date_time": [
+        lambda v: datetime.datetime.strptime(v, "%Y:%m:%d %H:%M:%S").strftime("%Y-%m-%d %H:%M"),
+    ],
+    "f_number": [lambda v: f"ƒ/{eval(v):.1f}"],
+    "focal_length": [lambda v: f"{eval(v):.0f}mm"],
+    "iso_speed_ratings": [lambda v: f"ISO{v}"],
+}
+
 
 def loadExifData(file_path: str):
     assert os.path.exists(file_path), f"Path {file_path} does not exist"
@@ -49,5 +59,12 @@ def loadExifData(file_path: str):
     for field in dataclasses.fields(exif_data):
         if getattr(exif_data, field.name) is None:
             logging.warning(f"File {file_path}, Missing exif field: {field.name}")
+
+    for k, fns in EXIF_TRANSFORM_MAP.items():
+        v = getattr(exif_data, k)
+        assert v is not None, f"Missing exif field: {k}"
+        for fn in fns:
+            v = fn(v)
+        setattr(exif_data, k, v)
 
     return exif_data
