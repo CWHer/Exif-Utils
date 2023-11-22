@@ -1,4 +1,7 @@
 import abc
+from typing import Tuple
+
+from PIL import Image
 
 
 class Op(abs.ABC):
@@ -7,50 +10,77 @@ class Op(abs.ABC):
         pass
 
     @abc.abstractmethod
-    def run(self, img):
+    def forward(self, *arg, **kwargs) -> Image.Image:
         pass
 
-class AddMargin(Op):
-    def __init__(self, margin_size, margin_color):
+# Nullary operation
+
+
+class ExifMark(Op):
+    def __init__(self):
+        raise NotImplementedError
+
+    def forward(self) -> Image.Image:
+        raise NotImplementedError
+
+
+class Identity(Op):
+    def __init__(self, img: Image.Image):
+        self.img = img
+
+    def forward(self) -> Image.Image:
+        return self.img
+
+
+# Unary operation
+class Resize(Op):
+    def __init__(self, size: Tuple[int, int]):
+        self.size = size
+
+    def forward(self, img: Image.Image) -> Image.Image:
+        raise NotImplementedError
+
+
+class Margin(Op):
+    def __init__(self, margin_size: int, margin_color: str):
         self.margin_size = margin_size
         self.margin_color = margin_color
 
-    def run(self, img):
-        return add_margin(img, self.margin_size, self.margin_color)
-    
-class AddPadding(Op):
-    def __init__(self, padding_size, padding_color, padding_location):
-        self.padding_size = padding_size
-        self.padding_color = padding_color
-        self.padding_location = padding_location
+    def forward(self, img: Image.Image) -> Image.Image:
+        raise NotImplementedError
 
-    def run(self, img):
-        return add_padding(img, self.padding_size, self.padding_color, self.padding_location)
-    
-class AddShadow(Op):
-    def __init__(self, shadow_size, shadow_color, shadow_position):
+
+class Shadow(Op):
+    def __init__(self, shadow_size: int, shadow_color: str):
         self.shadow_size = shadow_size
         self.shadow_color = shadow_color
-        self.shadow_position = shadow_position
 
-    def run(self, img):
-        return add_shadow(img, self.shadow_size, self.shadow_color, self.shadow_position)
-    
+    def forward(self, img: Image.Image) -> Image.Image:
+        raise NotImplementedError
 
-class AddExif(Op):
-    def __init__(self, exif_text, exif_font, exif_color, exif_position):
-        self.exif_text = exif_text
-        self.exif_font = exif_font
-        self.exif_color = exif_color
-        self.exif_position = exif_position
-
-    def run(self, img):
-        return add_exif(img, self.exif_text, self.exif_font, self.exif_color, self.exif_position)
+# Binary operation
 
 
-class AddBackground(Op):
-    def __init__(self, background_color):
-        self.background_color = background_color
+class Concat(Op):
+    """
+    Concatenate two images
+    """
 
-    def run(self, img):
-        return add_background(img, self.background_color)
+    def __init__(self, method: str):
+        assert method in ["horizontal", "vertical"]
+        self.method = method
+
+    def forward(self, img0: Image.Image, img1: Image.Image) -> Image.Image:
+        raise NotImplementedError
+
+
+class Merge(Op):
+    """
+    Merge image0 into image1, requires image0 to be smaller than image1
+    """
+
+    def __init__(self, position: Tuple[int, int]):
+        self.position = position
+
+    def forward(self, img0: Image.Image, img1: Image.Image) -> Image.Image:
+        raise NotImplementedError
