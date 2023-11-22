@@ -6,11 +6,17 @@
 
 ## Illustration
 
-|                             |                             |                             |
-| --------------------------- | --------------------------- | --------------------------- |
-| ![](./assets/images/1.jpeg) | ![](./assets/images/2.jpeg) | ![](./assets/images/3.jpeg) |
-| ![](./assets/images/4.jpeg) | ![](./assets/images/5.jpeg) | ![](./assets/images/6.jpeg) |
-| ![](./assets/images/7.jpeg) | ![](./assets/images/8.jpeg) | ![](./assets/images/9.jpeg) |
+![](./assets/images/left.jpeg)
+
+![](./assets/images/right-margin.jpeg)
+
+![](./assets/images/left-dark.jpeg)
+
+![](./assets/images/right-dark-margin.jpeg)
+
+![](./assets/images/background.jpeg)
+
+![](./assets/images/background-margin.jpeg)
 
 ## Usage
 
