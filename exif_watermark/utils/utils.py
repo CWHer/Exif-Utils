@@ -16,12 +16,6 @@ def getImagesPath(dir_path: str, suffix: List[str] = [".jpeg", ".NEF"]) -> List[
     return file_list
 
 
-def toAbsPath(path: str) -> str:
-    if not os.path.isabs(path):
-        path = os.path.abspath(path)
-    return path
-
-
 def concatenate_image(images, align='left'):
     """
     将多张图片拼接成一列

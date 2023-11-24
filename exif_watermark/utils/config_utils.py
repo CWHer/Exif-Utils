@@ -2,8 +2,8 @@ import os
 from typing import Dict
 
 import yaml
-from logo_utils import logo_manager
-from utils import toAbsPath
+
+from .logo_utils import logo_manager
 
 
 class ConfigManager:
@@ -23,21 +23,22 @@ class ConfigManager:
         self.background_config: Dict
 
     def setup(self, file_path: str) -> None:
-        file_path = toAbsPath(file_path)
+        file_path = os.path.abspath(file_path)
+        base_path = os.path.dirname(file_path)
         assert os.path.exists(file_path), f"{file_path} not exists"
         with open(file_path, "r", encoding="utf-8") as f:
             self.config = yaml.safe_load(f)
 
         # Basic config
-        self.logo_dir = self.config["base"]["logo_dir"]
+        self.logo_dir = os.path.join(base_path, self.config["base"]["logo_dir"])
         logo_manager.setup(self.logo_dir)
-        self.font_dir = toAbsPath(self.config["base"]["font"])
+        self.font_dir = os.path.join(base_path, self.config["base"]["font"])
         assert os.path.exists(self.font_dir), f"{self.font_dir} not exists"
-        self.bold_font_dir = toAbsPath(self.config["base"]["bold_font"])
+        self.bold_font_dir = os.path.join(base_path, self.config["base"]["bold_font"])
         assert os.path.exists(self.bold_font_dir), f"{self.bold_font_dir} not exists"
-        self.input_dir = toAbsPath(self.config["base"]["input_dir"])
+        self.input_dir = os.path.join(base_path, self.config["base"]["input_dir"])
         assert os.path.exists(self.input_dir), f"{self.input_dir} not exists"
-        self.output_dir = toAbsPath(self.config["base"]["output_dir"])
+        self.output_dir = os.path.join(base_path, self.config["base"]["output_dir"])
         assert os.path.exists(self.output_dir), f"{self.output_dir} not exists"
         self.quality = self.config["base"]["quality"]
 
